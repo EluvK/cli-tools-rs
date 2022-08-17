@@ -1,0 +1,24 @@
+[package]
+name = "cli-tools-rs"
+version = "0.0.1"
+edition = "2021"
+authors = ["EluvK"]
+description = "Linux Command Line Tools written in Rust."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "3.2.14", features = ["derive"] }
+hex = "0.4.3"
+rand = "0.8.5"
+rsa = "0.6.1"
+sha3 = "0.10.1"
+
+
+[[bin]]
+name = "rsa_generator"
+path = "./rsa/rsa_generator.rs"
+
+[[bin]]
+name = "rsa_crypto"
+path = "./rsa/rsa_crypto.rs"
