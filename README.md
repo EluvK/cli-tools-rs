@@ -5,9 +5,10 @@ My command line tools written in rust.
 
 ## Lists
 
-- [ ] RSA Key generator
-- [ ] RSA Crypto
-- [ ] Keystore Crypto
+- [x] RSA Key generator
+- [x] RSA Crypto
+- [x] Keystore Crypto
+- [ ] Keystore Decrypto && Primer
 
 ## How to Build && Install
 
@@ -15,5 +16,5 @@ My command line tools written in rust.
 
 
 ## TODOS
-- [ ] seperate different kinds of tools using workspace. To managed dependence better.
+- [x] seperate different kinds of tools using workspace. To managed dependence better.
 - [ ] Tools' version control

@@ -1,0 +1,24 @@
+[package]
+name = "rsa-tools-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["EluvK"]
+description = "RSA encrypt tools"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "3.2.14", features = ["derive"] }
+hex = "0.4.3"
+rand = "0.8.5"
+rsa = "0.6.1"
+sha3 = "0.10.1"
+
+
+[[bin]]
+name = "rsa_generator"
+path = "./bin/rsa_generator.rs"
+
+[[bin]]
+name = "rsa_crypto"
+path = "./bin/rsa_crypto.rs"
