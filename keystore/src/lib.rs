@@ -90,7 +90,6 @@ where
             key
         }
     };
-    println!("key: {:?}", hex::encode(&key));
 
     let derive_mac = Keccak256::new()
         .chain(&key[16..32])

@@ -23,7 +23,10 @@ sha3 = "0.10.1"
 thiserror = { version = "1.0.31", default-features = false }
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 
-
 [[bin]]
 name = "keystore_generator"
 path = "./bin/keystore_generator.rs"
+
+[[bin]]
+name = "keystore_decryptor"
+path = "./bin/keystore_decryptor.rs"
