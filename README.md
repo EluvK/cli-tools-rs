@@ -8,6 +8,7 @@ My command line tools written in rust.
 - [x] RSA Key generator
 - [x] RSA Crypto
 - [x] Keystore Crypto
+- [x] TopKeystore Crypto (Only Generator)
 - [ ] Keystore Decrypto && Primer
 
 ## How to Build && Install
