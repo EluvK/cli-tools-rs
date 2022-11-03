@@ -29,7 +29,7 @@ fn miner_keytype_to_str<S>(serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    serializer.serialize_str(KeyType::Miner.as_str())
+    serializer.serialize_str(KeyType::Worker.as_str())
 }
 
 fn str_to_keytype_owner<'de, D>(deserializer: D) -> Result<(), D::Error>
@@ -54,7 +54,7 @@ where
     use serde::de::Error;
 
     String::deserialize(deserializer).and_then(|string| {
-        if KeyType::str_equal(&string, KeyType::Miner) {
+        if KeyType::str_equal(&string, KeyType::Worker) {
             Ok(())
         } else {
             Err(Error::custom(TopUtilsError::KeyTypeError.to_string()))
@@ -74,20 +74,20 @@ pub enum KeyType {
         serialize_with = "miner_keytype_to_str",
         deserialize_with = "str_to_keytype_miner"
     )]
-    Miner,
+    Worker,
 }
 
 impl KeyType {
     fn as_str(&self) -> &'static str {
         match self {
             KeyType::Owner => "owner",
-            KeyType::Miner => "miner",
+            KeyType::Worker => "worker",
         }
     }
     fn from_str(data: &str) -> Result<KeyType, TopUtilsError> {
         match data {
             "owner" => Ok(KeyType::Owner),
-            "miner" => Ok(KeyType::Miner),
+            "worker" => Ok(KeyType::Worker),
             _ => Err(TopUtilsError::KeyTypeError),
         }
     }

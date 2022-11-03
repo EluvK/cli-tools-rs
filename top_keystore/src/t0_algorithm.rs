@@ -89,10 +89,6 @@ const DEFAULT_CIPHER: &str = "aes-256-cbc";
 const DEFAULT_KDF_TYPE: T0KdfType = T0KdfType::Hkdf;
 const DEFAULT_KDF_HKDF_DKLEN: u8 = 64;
 const DEFAULT_KDF_PRF: &str = "sha3-256"; // actually is "sha3-512"
-                                          // const DEFAULT_KDF_PARAMS_DKLEN: u8 = 32u8;
-                                          // const DEFAULT_KDF_PARAMS_LOG_N: u8 = 18u8; // The iteration count is used to slow down the computation
-                                          // const DEFAULT_KDF_PARAMS_R: u32 = 8u32;
-                                          // const DEFAULT_KDF_PARAMS_P: u32 = 1u32;
 
 #[allow(non_snake_case)]
 pub fn generate_T0_key_with_args<PriKBase, S, INFO, SALT, IV>(
@@ -164,13 +160,13 @@ where
             },
             mac: mac,
         },
-        hint: String::from("hint"),
+        hint: String::from(""),
         key_type: KeyType::Owner,
         public_key: base_prikey_to_top_base_pubkey(&pk)?,
     };
     if is_miner.is_some() {
         println!("miner address is {}", base_prikey_to_base_account(&pk)?);
-        top_keystore.key_type = KeyType::Miner;
+        top_keystore.key_type = KeyType::Worker;
         top_keystore.account_address = TopAddress::T0Address(is_miner.unwrap());
     }
 

@@ -8,7 +8,7 @@ struct Args {
     /// password to encrypt keystore file
     password: String,
 
-    /// specify private key in hex str
+    /// specify private key in hex str (without `0x`)
     #[clap(short = 'p', long = "private_key")]
     private_key: Option<String>,
 
@@ -17,8 +17,8 @@ struct Args {
     t0_account: bool,
 
     /// create minerkey, or owner key by default
-    #[clap(short = 'm', long = "miner")]
-    miner: Option<String>,
+    #[clap(short = 'm', long = "owner_address")]
+    owner_address: Option<String>,
 }
 
 fn main() -> Result<(), KeystoreError> {
@@ -36,10 +36,10 @@ fn main() -> Result<(), KeystoreError> {
     }
 
     if args.t0_account {
-        let result = generate_T0_keystore(pk, args.password, args.miner)?;
+        let result = generate_T0_keystore(pk, args.password, args.owner_address)?;
         println!("{}", result);
     } else {
-        let result = generate_T8_keystore(pk, args.password, args.miner)?;
+        let result = generate_T8_keystore(pk, args.password, args.owner_address)?;
         println!("{}", result);
     }
 
