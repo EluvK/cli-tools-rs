@@ -7,8 +7,8 @@ mod top_utils;
 
 pub use error::KeystoreError;
 use rand::RngCore;
-
-use crate::{t0_algorithm::generate_T0_key_with_args, t8_algorithm::generate_T8_key_with_args};
+use t0_algorithm::{decrypt_T0_keystore, generate_T0_key_with_args};
+use t8_algorithm::{decrypt_T8_keystore, generate_T8_key_with_args};
 
 #[allow(non_snake_case)]
 pub fn generate_T0_keystore<PriKBase, S>(
@@ -75,4 +75,24 @@ where
     let result = serde_json::to_string(&keystore)?;
 
     Ok(result)
+}
+
+#[allow(non_snake_case)]
+pub fn decrypt_T8_keystore_file(
+    keystore: String,
+    password: String,
+) -> Result<String, KeystoreError> {
+    let keystore = serde_json::from_str(&keystore)?;
+    decrypt_T8_keystore(keystore, password)
+}
+
+#[allow(non_snake_case)]
+pub fn decrypt_T0_keystore_file(
+    keystore: String,
+    password: String,
+) -> Result<String, KeystoreError> {
+    // compatible for old `account address`
+    let keystore = keystore.replace("account address", "account_address");
+    let keystore = serde_json::from_str(&keystore)?;
+    decrypt_T0_keystore(keystore, password)
 }

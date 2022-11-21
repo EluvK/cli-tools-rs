@@ -9,7 +9,7 @@ use ripemd::Ripemd160;
 use sha2::Sha256;
 use sha3::{Digest, Sha3_256, Sha3_512};
 
-use aes::cipher::{block_padding::Pkcs7, BlockEncryptMut, KeyIvInit};
+use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 
 use k256::{ecdsa::SigningKey, elliptic_curve::sec1::ToEncodedPoint, PublicKey};
 
@@ -171,6 +171,51 @@ where
     }
 
     Ok(top_keystore)
+}
+
+#[allow(non_snake_case)]
+pub fn decrypt_T0_keystore<S>(keystore: T0Keystore, password: S) -> Result<String, KeystoreError>
+where
+    S: AsRef<[u8]>,
+{
+    let key = match keystore.crypto.kdfparams {
+        T0KdfparamsType::Hkdf {
+            dklen,
+            info,
+            prf,
+            salt,
+        } => {
+            if dklen != DEFAULT_KDF_HKDF_DKLEN || prf != String::from(DEFAULT_KDF_PRF) {
+                return Err(KeystoreError::StdIo(String::from(
+                    "Invalid keystore params value",
+                )));
+            }
+            let hk = Hkdf::<Sha3_512>::new(Some(&salt[..]), password.as_ref());
+            let mut key = [0u8; 64];
+            hk.expand(&info, &mut key)
+                .expect("64 is a valid length for Sha512 to output");
+            key
+        }
+    };
+
+    let hash_slice = [&key[32..], &keystore.crypto.ciphertext].concat();
+
+    let mac = sha3_256(&hash_slice).to_vec();
+    if mac.as_slice() != keystore.crypto.mac.as_slice() {
+        return Err(KeystoreError::MacMismatch);
+    }
+
+    type Aes256CbcDec = cbc::Decryptor<aes::Aes256>;
+    let key_fixed: [u8; 32] = key[0..32].try_into().unwrap();
+    let iv_fixed: [u8; 16] = keystore.crypto.cipherparams.iv[0..16].try_into().unwrap();
+
+    let mut buf = [0u8; 48];
+    let pk = Aes256CbcDec::new(&key_fixed.into(), &iv_fixed.into())
+        .decrypt_padded_b2b_mut::<Pkcs7>(&keystore.crypto.ciphertext, &mut buf)
+        .unwrap()
+        .to_vec();
+
+    Ok(String::from(hex::encode(base64::decode(pk)?)))
 }
 
 #[cfg(test)]

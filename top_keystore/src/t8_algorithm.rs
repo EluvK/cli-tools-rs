@@ -135,6 +135,44 @@ where
     Ok(top_keystore)
 }
 
+#[allow(non_snake_case)]
+pub fn decrypt_T8_keystore<S>(keystore: T8Keystore, password: S) -> Result<String, KeystoreError>
+where
+    S: AsRef<[u8]>,
+{
+    let key = match keystore.crypto.kdfparams {
+        T8KdfparamsType::Scrypt {
+            dklen,
+            n,
+            p,
+            r,
+            salt,
+        } => {
+            let mut key = vec![0u8; dklen as usize];
+            let log_n = (n as f32).log2() as u8;
+            let scrypt_params = ScryptParams::new(log_n, r, p)?;
+            scrypt(password.as_ref(), &salt, &scrypt_params, key.as_mut_slice())?;
+            key
+        }
+    };
+    let derive_mac = Keccak256::new()
+        .chain(&key[16..32])
+        .chain(&keystore.crypto.ciphertext)
+        .finalize();
+    if derive_mac.as_slice() != keystore.crypto.mac.as_slice() {
+        return Err(KeystoreError::MacMismatch);
+    }
+    let mut decryptor = ctr::Ctr128BE::<aes::Aes128>::new(
+        (&key[..16]).into(),
+        (&keystore.crypto.cipherparams.iv[..16]).into(),
+    );
+
+    let mut pk = keystore.crypto.ciphertext.clone();
+    decryptor.apply_keystream(&mut pk);
+
+    Ok(String::from(hex::encode(pk)))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
